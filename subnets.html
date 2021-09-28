@@ -201,6 +201,15 @@ function createRow(calcbody, node, address, mask, labels, depth)
     newCell.appendChild(document.createTextNode(numHosts));
     newRow.appendChild(newCell);
 
+    /* Note */
+    var newCell = document.createElement('TD');
+    var newInput = document.createElement("input");
+    newInput.setAttribute("type", "text");
+    newInput.setAttribute("class", "note");
+    newInput.setAttribute("size", "15");
+    newCell.appendChild(newInput);
+    newRow.appendChild(newCell);
+
     /* actions */
 
     var newCell = document.createElement('TD');
@@ -558,6 +567,7 @@ If you wish to save this subnetting for later, bookmark <a href="subnets.html" i
 <col id="col_useable">
 <col id="col_hosts">
 <col id="col_divide">
+<col id="col_note">
 <col id="col_join">
 </colgroup>
 <thead>
@@ -567,6 +577,7 @@ If you wish to save this subnetting for later, bookmark <a href="subnets.html" i
 <td>Range of addresses</td>
 <td>Useable IPs</td>
 <td>Hosts</td>
+<td>Note</td>
 <td>Divide</td>
 <td id="joinHeader">Join</td>
 </tr>

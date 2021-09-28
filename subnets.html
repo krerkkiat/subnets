@@ -74,7 +74,7 @@ function recreateTables()
 
   createRow(calcbody, rootSubnet, curNetwork, curMask, [curMask, rootSubnet[1], rootSubnet], rootSubnet[0]);
 
-  document.getElementById('joinHeader').colSpan = (rootSubnet[0] > 0 ? rootSubnet[0] : 1);
+  document.getElementById('join_header').colSpan = (rootSubnet[0] > 0 ? rootSubnet[0] : 1);
   document.getElementById('col_join').span = (rootSubnet[0] > 0 ? rootSubnet[0] : 1);
 
   /* Create the bookmark hyperlink */
@@ -432,20 +432,46 @@ function parseQueryString (str)
   return args;
 }
 
-window.onload = calcOnLoad;
+window.onload = (e) => {
+  calcOnLoad();
 
-function toggleColumn(cb)
+  var controls = document.getElementsByClassName("col-controls");
+  for (var i = 0; i < controls.length; i++) {
+    controls[i].addEventListener("change", toggleColumn);
+  }
+};
+
+var column_mappings = {
+  col_subnet: 1,
+  col_netmask: 2,
+  col_range: 3,
+  col_useable: 4,
+  col_hosts: 5,
+  col_note: 6,
+  col_divide: 7,
+  col_join: 8,
+};
+function toggleColumn(e)
 {
-  var colName = 'col_'+(cb.id.substr(3));
-  var col = document.getElementById(colName);
+  // TODO: Hiding join controls will take more than one column.
+  var colName = 'col_'+(e.target.id.substr(3));
+  var col_header_selector = "#" + (e.target.id.substr(3)) + "_header";
+  var col_index = column_mappings[colName];
+  var body_elements = document.querySelectorAll(`#calcbody tr > *:nth-child(${col_index})`);
 
-  if (cb.checked) {
-    col.style.display = 'block';
+  if (e.target.checked) {
+    document.querySelector(col_header_selector).style = "";
+    for (var i = 0; i < body_elements.length; i++) {
+      body_elements[i].style = "";
+    }
   }
   else {
-    col.style.display = 'none';
+    document.querySelector(col_header_selector).style = "display: none";
+    for (var i = 0; i < body_elements.length; i++) {
+      body_elements[i].style = "display: none";
+    }
   }
-  recreateTables(); /* because IE draws lines all over the place with border-collapse */
+  //recreateTables(); /* because IE draws lines all over the place with border-collapse */
 }
 
 //-->
@@ -535,13 +561,14 @@ P		{
 </table>
 
 <p>Show columns: 
-<input type="checkbox" id="cb_subnet" checked onclick="toggleColumn(this)"><label for="cb_subnet">Subnet address</label>
-<input type="checkbox" id="cb_netmask" onclick="toggleColumn(this)"><label for="cb_netmask">Netmask</label>
-<input type="checkbox" id="cb_range" checked onclick="toggleColumn(this)"><label for="cb_range">Range of addresses</label>
-<input type="checkbox" id="cb_useable" checked onclick="toggleColumn(this)"><label for="cb_useable">Useable IPs</label>
-<input type="checkbox" id="cb_hosts" checked onclick="toggleColumn(this)"><label for="cb_hosts">Hosts</label>
-<input type="checkbox" id="cb_divide" checked onclick="toggleColumn(this)"><label for="cb_divide">Divide</label>
-<input type="checkbox" id="cb_join" checked onclick="toggleColumn(this)"><label for="cb_join">Join</label>
+<input type="checkbox" class="col-controls" id="cb_subnet" checked><label for="cb_subnet">Subnet address</label>
+<input type="checkbox" class="col-controls" id="cb_netmask" checked><label for="cb_netmask">Netmask</label>
+<input type="checkbox" class="col-controls" id="cb_range" checked><label for="cb_range">Range of addresses</label>
+<input type="checkbox" class="col-controls" id="cb_useable" checked><label for="cb_useable">Useable IPs</label>
+<input type="checkbox" class="col-controls" id="cb_hosts" checked><label for="cb_hosts">Hosts</label>
+<input type="checkbox" class="col-controls" id="cb_note" checked><label for="cb_note">Note</label>
+<input type="checkbox" class="col-controls" id="cb_divide" checked><label for="cb_divide">Divide</label>
+<!-- <input type="checkbox" class="col-controls" id="cb_join" checked><label for="cb_join">Join</label> -->
 </p>
 </form>
 
@@ -562,24 +589,24 @@ If you wish to save this subnetting for later, bookmark <a href="subnets.html" i
 <table class="calc" cellspacing="0" cellpadding="2">
 <colgroup>
 <col id="col_subnet">
-<col id="col_netmask" style="display: none">
+<col id="col_netmask">
 <col id="col_range">
 <col id="col_useable">
 <col id="col_hosts">
-<col id="col_divide">
 <col id="col_note">
+<col id="col_divide">
 <col id="col_join">
 </colgroup>
-<thead>
+<thead id="calchead">
 <tr>
-<td>Subnet address</td>
-<td>Netmask</td>
-<td>Range of addresses</td>
-<td>Useable IPs</td>
-<td>Hosts</td>
-<td>Note</td>
-<td>Divide</td>
-<td id="joinHeader">Join</td>
+<td id="subnet_header">Subnet address</td>
+<td id="netmask_header">Netmask</td>
+<td id="range_header">Range of addresses</td>
+<td id="useable_header">Useable IPs</td>
+<td id="hosts_header">Hosts</td>
+<td id="note_header">Note</td>
+<td id="divide_header">Divide</td>
+<td id="join_header">Join</td>
 </tr>
 </thead>
 <tbody id="calcbody">
